@@ -8,22 +8,28 @@ alphabet = "abcdefghijklmnopqrstuvwxyz"
 def availableQuery(x):
     pref = "".join(x)
     domain = pref + ".me"
+    retries = 0
 
-    try:
-        whois.whois(domain)
-    except:
-        print('Available:', domain)
-        return domain + '\n'
+    while retries < 3:
+        try:
+            response = whois.whois(domain)
+            if response == 'Socket not responding':
+                retries += 1
+            else:
+                retries = 3
+        except whois.parser.PywhoisError as e:
+            print('\n  Available:', domain, '|', str(e).split('\n')[0])
+            return domain + '\n'
+        except:
+            retries += 1
+
 
 if __name__ == '__main__':
-    domain_length = 3
+    domain_length = 1
     pool = multiprocessing.Pool(8)
     tasks = tuple(product(alphabet, repeat=domain_length))
 
-    for _ in tqdm.tqdm(pool_outputs := pool.imap_unordered(availableQuery, tasks), total=len(tasks)):
+    for _ in tqdm.tqdm(pool.imap_unordered(availableQuery, tasks), total=len(tasks)):
         pass
-
-    with open('domain.txt', 'w') as f:
-        f.writelines(pool_outputs)
 
     print("Done!")
