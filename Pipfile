@@ -7,7 +7,4 @@ verify_ssl = true
 
 [packages]
 python-whois = "*"
-tqdm = "*"
-
-[requires]
-python_version = "3.8"
+p-tqdm = "*"

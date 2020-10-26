@@ -1,18 +1,28 @@
-import multiprocessing
-from itertools import product
-import tqdm
+from p_tqdm import p_umap
 import whois
+from itertools import product
+import sys
+import os
 
 alphabet = "abcdefghijklmnopqrstuvwxyz"
 
-def availableQuery(x):
-    pref = "".join(x)
-    domain = pref + ".me"
+def blockPrint():
+    sys.stdout = open(os.devnull, 'w')
+
+def enablePrint():
+    sys.stdout = sys.__stdout__
+
+def availableQuery(x, domain_suff):
+    pref = ''.join(x)
+    domain = pref + domain_suff
     retries = 0
 
     while retries < 3:
         try:
+            blockPrint()
             response = whois.whois(domain)
+            return response
+            enablePrint()
             if response == 'Socket not responding':
                 retries += 1
             else:
@@ -25,11 +35,21 @@ def availableQuery(x):
 
 
 if __name__ == '__main__':
-    domain_length = 1
-    pool = multiprocessing.Pool(8)
-    tasks = tuple(product(alphabet, repeat=domain_length))
+    domain_length = 2
+    domain_suff = '.moe'
 
-    for _ in tqdm.tqdm(pool.imap_unordered(availableQuery, tasks), total=len(tasks)):
-        pass
+    print('--------------------Start!--------------------')
+    domain_pref = tuple(product(alphabet, repeat=domain_length))
+    domain_suff = [domain_suff for _ in domain_pref]
 
-    print("Done!")
+    result = p_umap(availableQuery, domain_pref, domain_suff)
+
+    print('--------------------Done!--------------------')
+    print(result)
+    result = set(result).remove(None)
+
+    if result:
+        with open('domains.txt', 'w') as f:
+            f.writelines(result)
+    else:
+        print('Nothing found!')
