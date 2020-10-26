@@ -45,7 +45,7 @@ if __name__ == '__main__':
     result = p_umap(availableQuery, domain_pref, domain_suff)
 
     print('--------------------Done!--------------------')
-    print(result)
+
     result = set(result).remove(None)
 
     if result:
