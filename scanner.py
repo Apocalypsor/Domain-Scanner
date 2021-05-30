@@ -1,58 +1,25 @@
-from p_tqdm import p_umap
-import whois
+from Check.check import check
+
+from p_tqdm import p_map
 from itertools import product
 import sys
 import os
 
 alphabet = "abcdefghijklmnopqrstuvwxyz"
 
-
-def blockPrint():
-    sys.stdout = open(os.devnull, "w")
-
-
-def enablePrint():
-    sys.stdout = sys.__stdout__
-
-
-def availableQuery(x, domain_suff):
-    pref = "".join(x)
-    domain = pref + domain_suff
-    retries = 0
-
-    while retries < 3:
-        try:
-            blockPrint()
-            response = whois.whois(domain)
-            return response
-            enablePrint()
-            if response == "Socket not responding":
-                retries += 1
-            else:
-                retries = 3
-        except whois.parser.PywhoisError as e:
-            print("\n  Available:", domain, "|", str(e).split("\n")[0])
-            return domain + "\n"
-        except:
-            retries += 1
-
-
 if __name__ == "__main__":
-    domain_length = 2
-    domain_suff = ".moe"
+    domain_length = (4, 5, 6)
+    domain_suff = ".com"
 
-    print("--------------------Start!--------------------")
-    domain_pref = tuple(product(alphabet, repeat=domain_length))
-    domain_suff = [domain_suff for _ in domain_pref]
+    if isinstance(domain_length, int):
+        domain_length = (domain_length)
 
-    result = p_umap(availableQuery, domain_pref, domain_suff)
+    for length in domain_length:
+        print(f"--------------------Start for {length} alphabet(s)!--------------------")
+        domain_pref = tuple(product(alphabet, repeat=length))
+        domain = ["".join(pref)+domain_suff for pref in domain_pref]
 
-    print("--------------------Done!--------------------")
+        result = p_map(check, domain)
 
-    result = set(result).remove(None)
+        print("----------------------------------Done!----------------------------------")
 
-    if result:
-        with open("domains.txt", "w") as f:
-            f.writelines(result)
-    else:
-        print("Nothing found!")
