@@ -2,11 +2,9 @@ from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 import requests
 
+
 def getUrl(url: str, headers={}, retry=5, timeout=10):
-    retry_strategy = Retry(
-        total=retry,
-        backoff_factor=0.1
-    )
+    retry_strategy = Retry(total=retry, backoff_factor=0.1)
 
     if not headers:
         headers = {
@@ -21,6 +19,7 @@ def getUrl(url: str, headers={}, retry=5, timeout=10):
     response = http.get(url, headers=headers, timeout=timeout)
 
     return response
+
 
 if __name__ == "__main__":
     print(getUrl("https://example.com").text)

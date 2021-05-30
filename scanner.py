@@ -12,14 +12,17 @@ if __name__ == "__main__":
     domain_suff = ".com"
 
     if isinstance(domain_length, int):
-        domain_length = (domain_length)
+        domain_length = domain_length
 
     for length in domain_length:
-        print(f"--------------------Start for {length} alphabet(s)!--------------------")
+        print(
+            f"--------------------Start for {length} alphabet(s)!--------------------"
+        )
         domain_pref = tuple(product(alphabet, repeat=length))
-        domain = ["".join(pref)+domain_suff for pref in domain_pref]
+        domain = ["".join(pref) + domain_suff for pref in domain_pref]
 
         result = p_map(check, domain)
 
-        print("----------------------------------Done!----------------------------------")
-
+        print(
+            "----------------------------------Done!----------------------------------"
+        )
